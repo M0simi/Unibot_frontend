@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-import Landing from "./pages/Landing";        // صفحة عامة للجميع
-import Home from "./pages/Home";              // صفحة محمية (داشبورد/شات)
+import Landing from "./pages/Landing";
+import Events from "./pages/Events";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/AdminDashboard";
 
 // إعداد Axios
 axios.defaults.baseURL = "http://127.0.0.1:8000/api/";
 axios.defaults.headers.post["Content-Type"] = "application/json";
+
+// حارس المسارات المحمية: يرسلنا لـ /login ويحفظ المسار السابق بـ location.state.from
+function Protected({ children, token }) {
+  const location = useLocation();
+  return token ? children : <Navigate to="/login" replace state={{ from: location.pathname }} />;
+}
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -32,11 +39,15 @@ export default function App() {
   const handleLogin = (newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
+    // ملاحظة: التوجيه سيتم داخل Login نفسه بعد النجاح
   };
 
   const handleLogout = () => {
     setToken(null);
     localStorage.removeItem("token");
+    delete axios.defaults.headers.common["Authorization"];
+    // نرجع للصفحة العامة
+    window.location.assign("/");
   };
 
   if (loading) {
@@ -50,29 +61,31 @@ export default function App() {
     );
   }
 
-  // حماية بسيطة للمسارات الخاصة
-  const Protected = ({ children }) => (token ? children : <Navigate to="/login" replace />);
-
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 font-cairo">
         <Navbar />
         <main className="max-w-6xl mx-auto px-4 py-6">
           <Routes>
-            {/* الصفحة الرئيسية العامة (Landing) */}
+            {/* صفحات عامة */}
             <Route path="/" element={<Landing />} />
+            <Route path="/events" element={<Events />} />
 
-            {/* تسجيل الدخول: لو مسجّل رجّعه للـ Home */}
+            {/* مصادقة */}
             <Route
               path="/login"
               element={!token ? <Login onLogin={handleLogin} /> : <Navigate to="/home" replace />}
             />
+            <Route
+              path="/register"
+              element={!token ? <Register /> : <Navigate to="/home" replace />}
+            />
 
-            {/* الصفحات المحمية */}
+            {/* صفحات محمية */}
             <Route
               path="/home"
               element={
-                <Protected>
+                <Protected token={token}>
                   <Home onLogout={handleLogout} />
                 </Protected>
               }
@@ -80,7 +93,7 @@ export default function App() {
             <Route
               path="/chat"
               element={
-                <Protected>
+                <Protected token={token}>
                   <Chat />
                 </Protected>
               }
@@ -88,16 +101,8 @@ export default function App() {
             <Route
               path="/profile"
               element={
-                <Protected>
+                <Protected token={token}>
                   <Profile />
-                </Protected>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <Protected>
-                  <AdminDashboard />
                 </Protected>
               }
             />
