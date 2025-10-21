@@ -1,33 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import axios from 'axios';
-import Login from './components/Login';
-import Home from './components/Home';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
 
-// Axios config (API connection)
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api/';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
-function App() {
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
+import Landing from "./pages/Landing";        // صفحة عامة للجميع
+import Home from "./pages/Home";              // صفحة محمية (داشبورد/شات)
+import Login from "./pages/Login";
+import Chat from "./pages/Chat";
+import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// إعداد Axios
+axios.defaults.baseURL = "http://127.0.0.1:8000/api/";
+axios.defaults.headers.post["Content-Type"] = "application/json";
+
+export default function App() {
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+      axios.defaults.headers.common["Authorization"] = `Token ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
     }
     setLoading(false);
   }, [token]);
 
   const handleLogin = (newToken) => {
     setToken(newToken);
-    localStorage.setItem('token', newToken);
+    localStorage.setItem("token", newToken);
   };
 
   const handleLogout = () => {
     setToken(null);
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem("token");
   };
 
   if (loading) {
@@ -41,17 +50,64 @@ function App() {
     );
   }
 
+  // حماية بسيطة للمسارات الخاصة
+  const Protected = ({ children }) => (token ? children : <Navigate to="/login" replace />);
+
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-cairo">
-        <Routes>
-          <Route path="/login" element={!token ? <Login onLogin={handleLogin} /> : <Navigate to="/" />} />
-          <Route path="/" element={token ? <Home onLogout={handleLogout} token={token} /> : <Navigate to="/login" />} />
-          <Route path="*" element={<Navigate to={token ? "/" : "/login"} />} />
-        </Routes>
+      <div className="min-h-screen bg-gray-50 font-cairo">
+        <Navbar />
+        <main className="max-w-6xl mx-auto px-4 py-6">
+          <Routes>
+            {/* الصفحة الرئيسية العامة (Landing) */}
+            <Route path="/" element={<Landing />} />
+
+            {/* تسجيل الدخول: لو مسجّل رجّعه للـ Home */}
+            <Route
+              path="/login"
+              element={!token ? <Login onLogin={handleLogin} /> : <Navigate to="/home" replace />}
+            />
+
+            {/* الصفحات المحمية */}
+            <Route
+              path="/home"
+              element={
+                <Protected>
+                  <Home onLogout={handleLogout} />
+                </Protected>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <Protected>
+                  <Chat />
+                </Protected>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <Protected>
+                  <Profile />
+                </Protected>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <Protected>
+                  <AdminDashboard />
+                </Protected>
+              }
+            />
+
+            {/* أي مسار غير معروف */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
     </Router>
   );
 }
-
-export default App;

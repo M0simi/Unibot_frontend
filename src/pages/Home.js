@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from '../components/Sidebar';
 import Chat from './Chat';
 import { LogOut } from 'lucide-react';
 
