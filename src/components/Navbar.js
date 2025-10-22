@@ -12,7 +12,7 @@ export default function Navbar() {
           <NavLink to="/" className={({isActive}) => `${base} ${isActive?active:""}`}>الرئيسية</NavLink>
           <NavLink to="/events" className={({isActive}) => `${base} ${isActive?active:""}`}>الاحداث</NavLink>
           <NavLink to="/chat" className={({isActive}) => `${base} ${isActive?active:""}`}>المحادثة</NavLink>
-          <NavLink to="/profile" className={({isActive}) => `${base} ${isActive?active:""}`}>ملفي</NavLink>
+          <NavLink to="/profile" className={({isActive}) => `${base} ${isActive?active:""}`}>الملف الشخصي</NavLink>
         </nav>
         <Link to="/login" className="px-3 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800">
           دخول

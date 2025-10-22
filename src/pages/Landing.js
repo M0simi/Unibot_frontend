@@ -8,9 +8,8 @@ export default function Landing() {
       </h1>
 
       <p className="text-gray-700 max-w-2xl mb-8 leading-relaxed">
-        <strong>عن Unibot 🎓</strong><br />
         Unibot هو مساعد ذكي للطلاب الحامعيين. يساعدك في طرح الاسئلة العامة
-        بسرعة وسهولة, قصتنا قصتنا بدأت في جعل الاجوبة اكثر قربا من كل طالب
+        بسرعة وسهولة, قصتنا بدأت في جعل المعلومات الجامعية اكثر قربا من كل طالب
       </p>
 
       <div className="flex flex-wrap justify-center gap-4">
@@ -24,19 +23,7 @@ export default function Landing() {
           to="/profile"
           className="px-6 py-3 rounded-xl border border-blue-700 text-blue-700 hover:bg-blue-50"
         >
-          👤 ملفي الشخصي
-        </Link>
-        <Link
-          to="/events"
-          className="px-6 py-3 rounded-xl border hover:bg-gray-100"
-        >
           📅 الاحداث
-        </Link>
-        <Link
-          to="/login"
-          className="px-6 py-3 rounded-xl border hover:bg-gray-100"
-        >
-          🔑 تسجيل الدخول
         </Link>
       </div>
 
