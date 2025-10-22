@@ -54,7 +54,7 @@ export default function Events() {
   return (
     <section className="font-cairo">
       <div className="mb-6 text-center">
-        <h1 className="text-3xl font-extrabold text-blue-800">الايفنتس الجامعية</h1>
+        <h1 className="text-3xl font-extrabold text-blue-800">الاحداث الجامعية</h1>
         <p className="text-gray-600 mt-2">هنا تلاقي أحدث الفعاليات وورش العمل</p>
       </div>
 
